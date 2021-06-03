@@ -14,7 +14,7 @@ class Post extends Equatable {
   final DateTime date;
 
   const Post({
-    @required this.id,
+    this.id,
     @required this.author,
     @required this.imageUrl,
     @required this.caption,
