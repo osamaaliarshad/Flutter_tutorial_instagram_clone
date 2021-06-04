@@ -2,8 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_instagram/helpers/helpers.dart';
 import 'package:flutter_instagram/screens/create_post/cubit/create_post_cubit.dart';
+import 'package:flutter_instagram/screens/edit_profile/cubit/edit_profile_cubit.dart';
 import 'package:flutter_instagram/widgets/widgets.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class CreatePostScreen extends StatelessWidget {
   static const String routeName = '/create';
@@ -105,7 +108,22 @@ class CreatePostScreen extends StatelessWidget {
     );
   }
 
-  void _selectPostImage(BuildContext context) {}
+  void _selectPostImage(BuildContext context) async {
+    final pickedFile = await ImageHelper.pickImageFromGallery(
+      context: context,
+      cropStyle: CropStyle.rectangle,
+      title: 'Create Post',
+    );
+    if (pickedFile != null) {
+      context.read<CreatePostCubit>().postImageChanged(pickedFile);
+    }
+  }
 
-  _submitForm(BuildContext context, File postImage, bool bool) {}
+  void _submitForm(BuildContext context, File postImage, bool isSubmitting) {
+    if (_formKey.currentState.validate() &&
+        postImage != null &&
+        !isSubmitting) {
+      context.read<CreatePostCubit>().submit();
+    }
+  }
 }
