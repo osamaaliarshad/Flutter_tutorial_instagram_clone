@@ -2,9 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_instagram/models/models.dart';
-import 'package:flutter_instagram/screens/edit_profile/edit_profile_screen.dart';
+
 import 'package:flutter_instagram/screens/profile/profile_screen.dart';
 import 'package:flutter_instagram/widgets/widgets.dart';
+import 'package:flutter_instagram/extensions/extensions.dart';
 
 class PostView extends StatelessWidget {
   final Post post;
@@ -21,7 +22,7 @@ class PostView extends StatelessWidget {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(18.0),
+          padding: const EdgeInsets.all(8.0),
           child: GestureDetector(
             onTap: () => Navigator.of(context).pushNamed(
               ProfileScreen.routeName,
@@ -74,7 +75,29 @@ class PostView extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 8.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [Text('${post.likes} likes')],
+            children: [
+              Text(
+                '${post.likes} likes',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(
+                height: 4.0,
+              ),
+              Text.rich(TextSpan(children: [
+                TextSpan(
+                  text: post.author.username,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                const TextSpan(text: ' '),
+                TextSpan(text: post.caption),
+              ])),
+              const SizedBox(
+                height: 4.0,
+              ),
+              Text(post.date.timeAgo(),
+                  style: TextStyle(
+                      color: Colors.grey[600], fontWeight: FontWeight.w500))
+            ],
           ),
         )
       ],
