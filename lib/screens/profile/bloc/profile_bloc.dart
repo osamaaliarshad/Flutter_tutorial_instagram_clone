@@ -43,7 +43,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       yield* _mapProfileToggleGridViewToState(event);
     } else if (event is ProfileUpdatePosts) {
       yield* _mapProfileUpdatePostsToStage(event);
-    }
+    } else if (event is ProfileFollowUser) {
+    } else if (event is ProfileUnfollowUser) {}
   }
 
   Stream<ProfileState> _mapProfileLoadUserToState(
@@ -52,6 +53,9 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     try {
       final user = await _userRepository.getUserWithId(userId: event.userId);
       final isCurrentUser = _authBloc.state.user.uid == event.userId;
+
+      final isFollowing = await _userRepository.isFollowing(
+          userId: _authBloc.state.user.uid, otherUserId: event.userId);
 
       _postsSubscription?.cancel();
       _postsSubscription = _postRepository
@@ -64,6 +68,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       yield state.copyWith(
         user: user,
         isCurrentUser: isCurrentUser,
+        isFollowing: isFollowing,
         status: ProfileStatus.loaded,
       );
     } catch (err) {
