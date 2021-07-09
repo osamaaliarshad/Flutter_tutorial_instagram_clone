@@ -48,6 +48,7 @@ class PostRepository extends BasePostRepository {
           (snap) => snap.docs.map((doc) => Comment.fromDocument(doc)).toList(),
         );
   }
+  
 
   @override
   Future<List<Post>> getUserFeed({@required String userId}) async {
