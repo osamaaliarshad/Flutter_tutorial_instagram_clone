@@ -48,7 +48,6 @@ class PostRepository extends BasePostRepository {
           (snap) => snap.docs.map((doc) => Comment.fromDocument(doc)).toList(),
         );
   }
-  
 
   @override
   Future<List<Post>> getUserFeed({@required String userId}) async {
@@ -61,5 +60,6 @@ class PostRepository extends BasePostRepository {
     final posts = Future.wait(
       postsSnap.docs.map((doc) => Post.fromDocument(doc)).toList(),
     );
+    return posts;
   }
 }
