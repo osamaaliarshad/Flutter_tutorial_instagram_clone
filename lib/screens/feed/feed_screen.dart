@@ -1,10 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_instagram/screens/feed/bloc/feed_bloc.dart';
+import 'package:flutter_instagram/screens/profile/widgets/post_view.dart';
 import 'package:flutter_instagram/widgets/error_dialog.dart';
 
-class FeedScreen extends StatelessWidget {
+class FeedScreen extends StatefulWidget {
   static const String routeName = '/feed';
+
+  @override
+  _FeedScreenState createState() => _FeedScreenState();
+}
+
+class _FeedScreenState extends State<FeedScreen> {
+  ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController()
+      ..addListener(() {
+        if (_scrollController.offset >=
+                _scrollController.position.maxScrollExtent &&
+            !_scrollController.position.outOfRange &&
+            context.read<FeedBloc>().state.status != FeedStatus.paginating) {
+          context.read<FeedBloc>().add(FeedPaginatePosts());
+        }
+      });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<FeedBloc, FeedState>(
@@ -22,16 +51,38 @@ class FeedScreen extends StatelessWidget {
             title: const Text('Instagram'),
             actions: [
               if (state.posts.isEmpty && state.status == FeedStatus.loaded)
-                {
-                  IconButton(
-                      icon: const Icon(Icons.refresh),
-                      onPressed: () =>
-                          context.read<FeedBloc>().add(FeedFetchPosts())),
-                }
+                IconButton(
+                    icon: const Icon(Icons.refresh),
+                    onPressed: () =>
+                        context.read<FeedBloc>().add(FeedFetchPosts())),
             ],
           ),
+          body: _buildBody(state),
         );
       },
     );
+  }
+
+  Widget _buildBody(FeedState state) {
+    switch (state.status) {
+      case FeedStatus.loading:
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      default:
+        return RefreshIndicator(
+          onRefresh: () async {
+            context.read<FeedBloc>().add(FeedFetchPosts());
+            return true;
+          },
+          child: ListView.builder(
+            itemCount: state.posts.length,
+            itemBuilder: (BuildContext context, int index) {
+              final post = state.posts[index];
+              return PostView(post: post, isLiked: false);
+            },
+          ),
+        );
+    }
   }
 }
