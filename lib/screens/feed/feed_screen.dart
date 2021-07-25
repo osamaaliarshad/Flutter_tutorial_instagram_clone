@@ -43,6 +43,14 @@ class _FeedScreenState extends State<FeedScreen> {
             context: context,
             builder: (context) => ErrorDialog(content: state.failure.message),
           );
+        } else if (state.status == FeedStatus.paginating) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Theme.of(context).primaryColor,
+              duration: const Duration(seconds: 1),
+              content: const Text('Fetching More Posts...'),
+            ),
+          );
         }
       },
       builder: (context, state) {
@@ -76,6 +84,7 @@ class _FeedScreenState extends State<FeedScreen> {
             return true;
           },
           child: ListView.builder(
+            controller: _scrollController,
             itemCount: state.posts.length,
             itemBuilder: (BuildContext context, int index) {
               final post = state.posts[index];
